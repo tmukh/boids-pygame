@@ -9,31 +9,23 @@ class Boid:
         self.position = Vector2(random.randint(
             0, 1280), random.randint(0, 720))
 
-        self.velocity = Vector2(random.random(), random.random())
+        self.velocity = Vector2(random.random(), random.random()).normalize()
+        self.speed = 5
         self.icon = pygame.image.load("boids.png")
-
         self.icon = pygame.transform.scale(self.icon, (10, 10))
-        self.ray_end = self.position
-
-        print(self.position, self.velocity)
 
     def update(self, boids):
-        self.position += self.velocity
-
-        self.angle = math.degrees(
-            math.atan2(-self.velocity.y, self.velocity.x))
-
         self.avoid(boids)
         self.align(boids)
         self.cohere(boids)
 
-        self.velocity.scale_to_length(10)
-
+        self.velocity = self.velocity.normalize() * self.speed
         self.position += self.velocity
-        print(self.velocity, self.position)
+        self.angle = math.degrees(
+            math.atan2(-self.velocity.y, self.velocity.x))
 
     def cohere(self, boids):
-        cohesion_radius = 200
+        cohesion_radius = 100
         cohesion_vector = pygame.Vector2()
         total_weight = 0
 
@@ -59,8 +51,8 @@ class Boid:
 
     def avoid(self, boids):
         edge_threshold = 100
-        avoidance_radius = 50
-        fov_angle = 260
+        avoidance_radius = 200
+        fov_angle = 300
 
         boid_avoidance_vector = pygame.Vector2()
         total_weight = 0
@@ -141,7 +133,7 @@ class Boid:
 
 
 pygame.init()
-screen = pygame.display.set_mode((1280, 720))
+screen = pygame.display.set_mode((1920, 1080))
 clock = pygame.time.Clock()
 running = True
 dt = 0
@@ -158,9 +150,9 @@ while running:
     screen.fill("white")
 
     for boid in boids:
-        if boid.position.x < 0 or boid.position.x > 1280:
+        if boid.position.x < 0 or boid.position.x > 1920:
             boid.velocity.x *= -1
-        if boid.position.y < 0 or boid.position.y > 720:
+        if boid.position.y < 0 or boid.position.y > 1080:
             boid.velocity.y *= -1
 
     for boid in boids:
